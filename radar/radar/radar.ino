@@ -1,9 +1,9 @@
-int ip = 12;
+int ip = 18;
 
 int val = 0;
 
 int led = 22;
-
+int p=0;
 
 void setup() {
 
@@ -22,19 +22,21 @@ void loop() {
 
   Serial.println(val, DEC);
 
-  if(val >0)
+  if(val > 0)
 
   {
 
     digitalWrite(led, HIGH);
-
+    Serial.println("detected");
   }
 
   else
 
   {
-
     digitalWrite(led, LOW);
+    Serial.println("nada" );
+    Serial.println(p++);
+    
 
   }
 
