@@ -9,7 +9,7 @@
 // constants won't change
 #define LIGHT_SENSOR_PIN  15  // ESP32 pin GIOP36 (ADC0) connected to light sensor for taking input
 #define LED_PIN           22  // ESP32 pin GIOP22 connected to LED //output
-#define ANALOG_THRESHOLD  400
+#define ANALOG_THRESHOLD  500
 #define RADAR  18
 
 bool val= false;
@@ -40,7 +40,7 @@ void loop() {
 
    // generate 10-microsecond pulse to TRIG pin //this will send the pulses outwards at 10sec
   digitalWrite(TRIG_PIN, HIGH);
-  delayMicroseconds(20);
+  delayMicroseconds(500);
   digitalWrite(TRIG_PIN, LOW);
 
   // measure duration of pulse from ECHO pin
@@ -49,38 +49,39 @@ void loop() {
   // calculate the distance
   distance_cm = 0.017 * duration_us;
    if(distance_cm<200){//person has enterd the sensor range 
-   flag=1
+   flag=!flag;
     Serial.print("distance: ");
     Serial.print(distance_cm);
     Serial.println(" cm");
     val = digitalRead(RADAR);
-     if(val==1)// some movement is detected near light
+    if(!flag){digitalWrite(LED_PIN, LOW);}
+    else if(val==1 && flag)// some movement is detected near light
 
   {
     digitalWrite(LED_PIN, HIGH); // turn on LED
-   
-  delay(500);
-
+ 
   }
 
-  else  {
+  else if(val==0) {
+    flag=0;
     Serial.print("turn off due radar");//no person is around the light // false reading by US
    digitalWrite(LED_PIN, LOW);
 
   }
-
-       
+   delay(500);
   }
-  else   { digitalWrite(LED_PIN, LOW); 
-    Serial.print("distance: ");
-    Serial.print(distance_cm );
-    Serial.println(" cm");
-    Serial.println(" => turn off due us");
+  else   { 
+    //digitalWrite(LED_PIN, LOW); 
+   // Serial.print("distance: ");
+   // Serial.print(distance_cm );
+   // Serial.println(" cm");
+    //Serial.println(" => turn off due us");
    } // turn off LED
 
   }
 else{
   digitalWrite(LED_PIN, LOW); 
+  flag=0;
    Serial.println(" => turn off due ldr");
 }
 
