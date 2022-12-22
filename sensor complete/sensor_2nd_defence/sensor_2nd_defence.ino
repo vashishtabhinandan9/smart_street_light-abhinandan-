@@ -11,7 +11,7 @@
 #define LED_PIN           22  // ESP32 pin GIOP22 connected to LED //output
 #define ANALOG_THRESHOLD  500
 #define RADAR  18
-
+bool radardetect =false;
 bool val= false;
 int p=0;
 
@@ -48,29 +48,34 @@ void loop() {
 
   // calculate the distance
   distance_cm = 0.017 * duration_us;
-   if(distance_cm<200){//person has enterd the sensor range 
-   flag=!flag;
+   if(distance_cm<200 || radardetect ){//person has enterd the sensor range 
+  if(distance_cm<200) flag=!flag;
     Serial.print("distance: ");
     Serial.print(distance_cm);
     Serial.println(" cm");
-    val = digitalRead(RADAR);
-    if(!flag){digitalWrite(LED_PIN, LOW);}
-    else if(val==1 && flag)// some movement is detected near light
+    
 
-  {
-    digitalWrite(LED_PIN, HIGH); // turn on LED
- 
-  }
+    if(flag){//person enters
+      val = digitalRead(RADAR);
+      Serial.println(val);
+      if(val==1){ p=val;
+      radardetect=true;
+      digitalWrite(LED_PIN, HIGH);
+      } // turn on LED// some movement is detected near light
+      
+      else{//flag=0;
+      radardetect=false;
+    Serial.println("turn off due radar");//no person is around the light // false reading by US
+   digitalWrite(LED_PIN, LOW);}
 
-  else if(val==0) {
-    flag=0;
-    Serial.print("turn off due radar");//no person is around the light // false reading by US
-   digitalWrite(LED_PIN, LOW);
+    }
+    else{digitalWrite(LED_PIN, LOW);}//person exits
 
-  }
    delay(500);
   }
   else   { 
+    if(!radardetect) digitalWrite(LED_PIN, LOW);
+  //  if(p){}
     //digitalWrite(LED_PIN, LOW); 
    // Serial.print("distance: ");
    // Serial.print(distance_cm );
